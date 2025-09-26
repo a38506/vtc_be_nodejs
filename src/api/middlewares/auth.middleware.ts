@@ -34,3 +34,16 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
     return res.status(401).json({ message: 'Token không hợp lệ hoặc đã hết hạn.' });
   }
 };
+
+export const authorize = (...allowedRoleIds: number[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Không được phép, thiếu thông tin người dùng.' });
+    }
+    const userRoleId = req.user.role_id;
+    if (!allowedRoleIds.includes(userRoleId)) {
+      return res.status(403).json({ message: 'Bạn không có quyền truy cập tài nguyên này.' });
+    }
+    next();
+  };
+};
